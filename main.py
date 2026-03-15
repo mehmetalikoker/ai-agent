@@ -17,3 +17,4 @@ modelEngine = aimodel.bind_tools(tavilysearch)
 if __name__ == "__main__":
     response = modelEngine.invoke([HumanMessage(content="what is Mehmet Ali Köker job")])
     print(response)
+    print(response.tool_calls)
