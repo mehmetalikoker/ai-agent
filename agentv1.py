@@ -18,7 +18,7 @@ agent = create_react_agent(aimodel,tavilysearch)
 
 if __name__ == "__main__":
     response = agent.invoke(
-        {"messages": [HumanMessage(content="Who is software architect mehmet ali koker")]},
+        {"messages": [HumanMessage(content="Who is software architect martin fowler")]},
     )
     for message in response["messages"]:
         print(message.content)
