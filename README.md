@@ -1,2 +1,3 @@
 # AI-Agentv1
-AI-Agentv1 project is a Python-based project with AI Agent and Tavily integration.
+This project features an Agent structure capable of querying and returning either directly via an LLM or through various tools, depending on the question type. 
+It utilizes Tavily for it's search infrastructure.
