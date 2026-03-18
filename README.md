@@ -14,3 +14,5 @@ Terminal -> streamlit run agentwithui.py
 
 For the UI and RAG version (agentwithrag.py)
 Terminal -> streamlit run agentwithrag.py
+
+<img width="1200" height="560" alt="image" src="https://github.com/user-attachments/assets/291bf8d2-dd4f-4825-94e5-5939e51a66ba" />
