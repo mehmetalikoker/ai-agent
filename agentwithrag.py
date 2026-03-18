@@ -36,7 +36,7 @@ def process_pdf(uploaded_file):
     pdf_tool = create_retriever_tool(
         retriever,
         "pdf_search",
-        "Yüklenen döküman içindeki bilgileri aramak için bu aracı kullan. Teknik detaylar için buraya bak."
+        "Use this tool to search for information within the uploaded document."
     )
     return pdf_tool
 
@@ -47,12 +47,12 @@ st.title("📄 PDF & Web Research Agent")
 
 # Sidebar: PDF Load Area
 with st.sidebar:
-    st.header("Döküman Yükle")
-    uploaded_file = st.file_uploader("Bir PDF dosyası seç", type="pdf")
+    st.header("Upload document")
+    uploaded_file = st.file_uploader("Select a PDF file", type="pdf")
     if uploaded_file:
-        st.success("PDF başarıyla yüklendi!")
+        st.success("PDF downloaded successfully !")
         if "pdf_tool" not in st.session_state:
-            with st.spinner("Döküman analiz ediliyor..."):
+            with st.spinner("The document is being analyzed..."):
                 st.session_state.pdf_tool = process_pdf(uploaded_file)
 
 
