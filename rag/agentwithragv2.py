@@ -9,14 +9,13 @@ from langchain.tools.retriever import create_retriever_tool
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
-# --- Configuration & Page Setup ---
 load_dotenv()
-st.set_page_config(page_title="Universal Knowledge Agent", layout="wide")
+st.set_page_config(page_title="xFramework Agent", layout="wide")
 
 
-# --- 1. Multi-File Processing Logic ---
+# Multi-File Processing Logic ---
 def process_multiple_files(uploaded_files):
     all_docs = []
     temp_dir = "temp_docs"
@@ -28,15 +27,12 @@ def process_multiple_files(uploaded_files):
         with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
-        # Automatically detects file type (PDF, Docx, TXT, etc.)
         loader = UnstructuredFileLoader(file_path)
         all_docs.extend(loader.load())
 
-    # Text Splitting
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=200)
     splits = text_splitter.split_documents(all_docs)
 
-    # Vector Store Creation
     vectorstore = FAISS.from_documents(splits, OpenAIEmbeddings())
     retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
 
@@ -46,12 +42,10 @@ def process_multiple_files(uploaded_files):
         "Use this tool to search through the uploaded documents (PDF, Word, Excel, Text)."
     )
 
-
-# --- 2. Sidebar & File Uploads ---
-st.title("📂 Universal Knowledge Agent")
+st.title("📂 xFramework Agent")
 
 with st.sidebar:
-    st.header("Document Repository")
+    st.header("Upload Document")
     uploaded_files = st.file_uploader(
         "Drop files here (PDF, DOCX, TXT, CSV...)",
         accept_multiple_files=True
@@ -63,7 +57,7 @@ with st.sidebar:
             st.success(f"{len(uploaded_files)} files are ready!")
 
 
-# --- 3. Agent Initialization ---
+# Agent Initialization
 @st.cache_resource
 def get_base_tools():
     return [TavilySearchResults(max_results=3)]
@@ -73,20 +67,13 @@ tools = get_base_tools()
 if "doc_tool" in st.session_state:
     tools.append(st.session_state.doc_tool)
 
-# Persisting memory in SQLite
 memory = SqliteSaver.from_conn_string("memory.db")
 llm = ChatOpenAI(model="gpt-4-turbo", streaming=True)
-
-# System Prompt to define the agent's persona
 system_message = "You are a highly skilled Software Architect. Provide technical, concise, and accurate information."
 
-agent = create_react_agent(
-    llm,
-    tools,
-    checkpointer=memory,
-    prompt=system_message
-)
-# --- 4. Chat UI ---
+# Creating agent without complex parameters to avoid version errors
+agent = create_react_agent(llm, tools, checkpointer=memory)
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -96,7 +83,6 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 if prompt := st.chat_input("Ask about documents or the web..."):
-    # Store and display user message
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -104,12 +90,18 @@ if prompt := st.chat_input("Ask about documents or the web..."):
     with st.chat_message("assistant"):
         with st.status("Processing data...", expanded=False) as status:
             full_response = ""
-            config = {"configurable": {"thread_id": "multi_doc_session_en"}}
+            config = {"configurable": {"thread_id": "multi_doc_session_final"}}
 
-            # Stream the agent's response steps
-            for chunk in agent.stream({"messages": [HumanMessage(content=prompt)]}, config=config):
+            input_data = {
+                "messages": [
+                    SystemMessage(content=system_message),
+                    HumanMessage(content=prompt)
+                ]
+            }
+
+            for chunk in agent.stream(input_data, config=config):
                 for key, value in chunk.items():
-                    st.write(f"Executing step: `{key}`")
+                    st.write(f"Executing: `{key}`")
                     if "messages" in value:
                         msg = value["messages"][-1]
                         if isinstance(msg, AIMessage) and msg.content:
@@ -117,6 +109,5 @@ if prompt := st.chat_input("Ask about documents or the web..."):
 
             status.update(label="Response Ready!", state="complete")
 
-        # Display final response
         st.markdown(full_response)
         st.session_state.messages.append({"role": "assistant", "content": full_response})
