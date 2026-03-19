@@ -13,13 +13,13 @@ This project features an AI Agent architecture capable of generating responses b
 ## How It Works
 Running the class via terminal is sufficient.
 
-For the UI version (agentwithui.py)
+For the UI version 
 - Terminal -> streamlit run agentwithui.py
 
-For the UI and RAG PDF version (agentwithrag.py)
+For the UI and RAG PDF version 
 - Terminal -> streamlit run agentwithrag.py
 
-For the UI and RAG Multiple file version (agentwithragv2.py)
+For the UI and RAG Multiple file version 
 - Terminal -> streamlit run agentwithragv2.py
 
 ## Requirements
