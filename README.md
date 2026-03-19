@@ -1,7 +1,8 @@
 # What's ai-agent Project
 This project features an AI Agent architecture capable of generating responses by leveraging LangChain and LangGraph, with the ability to perform real-time web research via the Tavily infrastructure based on the complexity of the query.
 - Langgraph was used in agent management.
-- It utilizes Tavily for it's search infrastructure. 
+- It utilizes Tavily for it's search infrastructure.
+- Pytest was used for the test infrastructure.
 - Additionally, LangSmith was used in the application's monitoring and testing processes.
 
 ## Documentation
@@ -21,6 +22,9 @@ For the UI and RAG PDF version
 
 For the UI and RAG Multiple file version 
 - Terminal -> streamlit run agentwithragv2.py
+
+For the test class running
+- pytest -v tests/test_rag.py
 
 ## Requirements
 - OPENAI_API_KEY
